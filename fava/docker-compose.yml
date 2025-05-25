@@ -1,0 +1,11 @@
+services:
+  fava:
+    container_name: fava
+    image: yegle/fava
+    ports:
+      - 5000:5000
+    environment:
+      - BEANCOUNT_FILE=/bean/Bob.beancount
+    volumes:
+      - ./bean:/bean
+    restart: no

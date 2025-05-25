@@ -1,0 +1,9 @@
+import os
+FAVA_DIR = os.environ.get("FAVA_DIR", os.path.abspath(os.path.dirname(__file__) + "/../../fava"))
+USER_1_NAME = os.environ.get("USER_1_NAME", "Bob")
+USER_1_BEANCOUNT_FILE = os.path.abspath(FAVA_DIR + "/" + USER_1_NAME + "/ledger.beancount")
+print("USER_1_BEANCOUNT_FILE:", USER_1_BEANCOUNT_FILE)
+USER_2_NAME = os.environ.get("USER_2_NAME", "Joe")
+USER_2_BEANCOUNT_FILE = os.path.abspath(FAVA_DIR + "/" + USER_2_NAME + "/ledger.beancount")
+SHARED_NAME = os.environ.get("SHARED_NAME", "Shared")
+INDENT_STRING = os.environ.get("INDENT_STRING", "    ")

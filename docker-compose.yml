@@ -1,0 +1,53 @@
+services:
+  server:
+    build:
+      context: ./server
+      target: dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server:/app
+      - ${FAVA_DIR}:/app/fava
+    environment:
+      - FAVA_DIR=${FAVA_DIR}
+    networks:
+      - internal
+  
+  client:
+    build:
+      context: ./client
+      target: dev
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    networks:
+      - internal
+
+  fava_user1:
+    image: yegle/fava
+    ports:
+      - "5000:5000"
+    volumes:
+      - ${FAVA_DIR}/${USER_1_NAME}:/bean
+    environment:
+      - BEANCOUNT_FILE=/bean/ledger.beancount
+    networks:
+      - internal
+
+  fava_user2:
+    image: yegle/fava
+    ports:
+      - "5001:5000"
+    volumes:
+      - ${FAVA_DIR}/${USER_2_NAME}:/bean
+    environment:
+      - BEANCOUNT_FILE=/bean/ledger.beancount
+    networks:
+      - internal
+    
+networks:
+  internal:

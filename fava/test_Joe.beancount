@@ -1,0 +1,32 @@
+; Example Beancount file
+option "title" "Personal Finances"
+option "operating_currency" "CAD"
+
+; Open accounts
+1970-01-01 open Equity:Bob CAD
+1970-01-01 open Assets:Bank:Chequing CAD
+1970-01-01 open Assets:Bank:Savings CAD
+1970-01-01 open Liabilities:CreditCard CAD
+1970-01-01 open Expenses:Food:Groceries CAD
+1970-01-01 open Expenses:Food:Groceries:Shared CAD
+1970-01-01 open Expenses:House CAD
+1970-01-01 open Expenses:House:Shared CAD
+1970-01-01 open Expenses:Rent CAD
+1970-01-01 open Expenses:Rent:Shared CAD
+1970-01-01 open Expenses:Hobbies
+1970-01-01 open Expenses:Hobbies:Shared
+1970-01-01 open Income:Salary CAD
+
+; Transactions
+2025-01-02 * "Printer" ""
+    Expenses:Hobbies 150.00 CAD
+    Liabilities:CreditCard -150.00 CAD
+    
+2025-01-06 * "Reimbursement: Sobeys" "" #shared
+    Expenses:Food:Groceries:Shared 22.50 CAD
+    Equity:Bob -22.50 CAD
+
+2025-01-07 * "Reimbursement: Bell" "" #shared
+    Expenses:House:Shared 27.61 CAD
+    Equity:Bob -27.61 CAD
+ 
