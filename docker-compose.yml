@@ -7,7 +7,9 @@ services:
       - "8000:8000"
     volumes:
       - ./server:/app
-      - ${FAVA_DIR}:/app/fava
+      - ${GLOBAL_FAVA_DIR}:/app/fava
+    env_file:
+      - .env
     environment:
       - FAVA_DIR=${FAVA_DIR}
     networks:
@@ -32,7 +34,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ${FAVA_DIR}/${USER_1_NAME}:/bean
+      - ${GLOBAL_FAVA_DIR}/${USER_1_NAME}:/bean
     environment:
       - BEANCOUNT_FILE=/bean/ledger.beancount
     networks:
@@ -43,7 +45,7 @@ services:
     ports:
       - "5001:5000"
     volumes:
-      - ${FAVA_DIR}/${USER_2_NAME}:/bean
+      - ${GLOBAL_FAVA_DIR}/${USER_2_NAME}:/bean
     environment:
       - BEANCOUNT_FILE=/bean/ledger.beancount
     networks:

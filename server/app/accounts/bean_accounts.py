@@ -20,7 +20,7 @@ def get_bean_accounts(owner: str):
             if account_flag:
                 if line == "":
                     break
-                if SHARED_NAME in line or other_user in line:
+                if SHARED_NAME in line or "Equity:"+other_user in line:
                     continue
                 account = line.split(" ")[2]
                 accounts.append(account)
