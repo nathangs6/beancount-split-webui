@@ -14,5 +14,4 @@ class ConfigServices:
                 raise ValueError("Configuration file is empty or not found.")
         except Exception as e:
             raise Exception(f"An unexpected error occurred while reading the key rules configuration")
-        print(config)
         return config
