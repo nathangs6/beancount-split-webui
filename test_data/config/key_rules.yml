@@ -1,0 +1,17 @@
+keyrules:
+  rule0:
+    name: "Sobeys"
+    key: "sobeys"
+    plus_account: "Expenses:Food:Groceries"
+    minus_account: ""
+    shared_percentages:
+      - 0.5
+      - 0.5
+    is_duplicate: false
+  rule1:
+    name: "Electronics"
+    key: "electronics"
+    plus_account: "Expenses:Hobbies"
+    minus_account: ""
+    shared_percentages:
+    is_duplicate: true
