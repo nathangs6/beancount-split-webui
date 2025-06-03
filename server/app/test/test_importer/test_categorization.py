@@ -1,15 +1,12 @@
-from fastapi.testclient import TestClient
-
-from ...main import app
 from ...importer.helpers_categorization import apply_key_rule_categorization
-from ...importer.types_beancount import JSONTransaction
-
-client = TestClient(app)
+from ...importer.types_beancount import Transaction
 
 
 def test_rule_based():
     request = [
         {
+            "account_type": "",
+            "account_number": "",
             "plus_account": "",
             "minus_account": "Assets:Bank:Chequing",
             "transaction_date": "2025-01-06",
@@ -20,6 +17,8 @@ def test_rule_based():
             "is_duplicate": False
         },
         {
+            "account_type": "",
+            "account_number": "",
             "plus_account": "",
             "minus_account": "Assets:Bank:Chequing",
             "transaction_date": "2025-01-07",
@@ -30,6 +29,8 @@ def test_rule_based():
             "is_duplicate": False
         },
         {
+            "account_type": "",
+            "account_number": "",
             "plus_account": "",
             "minus_account": "Assets:Bank:Chequing",
             "transaction_date": "2025-01-06",
@@ -42,7 +43,7 @@ def test_rule_based():
     ]
     transactions = []
     for transaction in request:
-        transactions.append(JSONTransaction(**transaction))
+        transactions.append(Transaction(**transaction))
     
     apply_key_rule_categorization(transactions)
     assert transactions[0].plus_account == "Expenses:Food:Groceries"

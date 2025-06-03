@@ -3,68 +3,77 @@ from io import StringIO
 from typing import List, Dict
 from datetime import datetime
 from beancount import loader
-from .types_beancount import JSONTransaction, FromBankTransaction
+from .types_beancount import Transaction
 from ..env import INDENT_STRING, SHARED_NAME, USER_1_NAME, USER_1_BEANCOUNT_FILE, USER_2_NAME, USER_2_BEANCOUNT_FILE
 from ..config.config_services import get_csv_column_mapping
+from .helpers_categorization import determine_duplicates, apply_key_rule_categorization
 
 #####################
 ### FILE HANDLING ###
 #####################
-def process_uploaded_file(contents: bytes) -> List[FromBankTransaction]:
+def init_transactions(contents: bytes) -> List[Transaction]:
     """
-    Processes the uploaded file and returns a list of JSONTransaction objects
+    Given an uploaded file containing bytes content contents, process the file
+    and return a list of initialized transactions.
+    Input:
+        - contents (bytes): the uploaded file
+    Output: A list of initialized Transaction
     """
     # Get the column mapping
     columns = get_csv_column_mapping()
+    # Then, read the file and create the transaction list
     buffer = StringIO(contents.decode("utf-8"))
     reader = csv.reader(buffer)
     next(reader)
     transactions = []
     for row in reader:
-        transaction = FromBankTransaction(
+        transaction = Transaction(
             account_type=row[columns["account_type"]],
             account_number=row[columns["account_number"]],
+            plus_account="",
+            minus_account="",
             transaction_date=row[columns["transaction_date"]],
             description=row[columns["description"]],
+            extended_description="",
             amount=float(row[columns["amount"]]),
+            shared_percentages={},
+            is_duplicate=False
         )
         transaction.transaction_date = datetime.strptime(transaction.transaction_date, "%m/%d/%Y").strftime("%Y-%m-%d")
         transactions.append(transaction)
     return transactions
 
+def load_beancount_file(owner: str):
+    if owner == USER_1_NAME:
+        fp = USER_1_BEANCOUNT_FILE
+    elif owner == USER_2_NAME:
+        fp = USER_2_BEANCOUNT_FILE
+    else:
+        raise Exception("Owner not valid!")
+    try:
+        with open(fp, "r") as file:
+            beancount_data = file.readlines()
+    except Exception as e:
+        raise Exception(f"Error reading beancount file: {e}")
+    return beancount_data
 
-##################
-### VALIDATION ###
-##################
-def validate_transaction(transaction: JSONTransaction) -> bool:
+def process_uploaded_file(owner: str, contents: bytes) -> List[Transaction]:
     """
-    Validates the JSONTransaction object
+    Processes the uploaded file and returns a list of JSONTransaction objects
     """
-    if not transaction.transaction_date:
-        return False
-    if not transaction.description:
-        return False
-    if not transaction.amount:
-        return False
-    if not transaction.plus_account:
-        return False
-    if not transaction.minus_account:
-        return False
-    return True
+    transactions = init_transactions(contents)
+    # Next, load the beancount file
+    beancount = load_beancount_file(owner)
+    # Now, apply the varying pre-processing methods for the transactions
+    determine_duplicates(transactions, beancount)
+    apply_key_rule_categorization(transactions)
+    return transactions
 
-def validate_transactions(transactions: List[JSONTransaction]) -> bool:
-    """
-    Validates a list of JSONTransaction objects
-    """
-    for transaction in transactions:
-        if not transaction.is_duplicate and not validate_transaction(transaction):
-            return False
-    return True
 
 ######################
 ### PRE-PROCESSING ###
 ######################
-def preprocess_transactions(transactions: List[FromBankTransaction]) -> List[JSONTransaction]:
+def preprocess_transactions(transactions: List[Transaction]) -> None:
     """
     Pre-processes the FromBankTransaction objects into JSONTransaction objects
     """
@@ -82,12 +91,41 @@ def preprocess_transactions(transactions: List[FromBankTransaction]) -> List[JSO
         )
         json_transactions.append(json_transaction)
     return json_transactions
+
+
+##################
+### VALIDATION ###
+##################
+def validate_transaction(transaction: Transaction) -> bool:
+    """
+    Validates the JSONTransaction object
+    """
+    if not transaction.transaction_date:
+        return False
+    if not transaction.description:
+        return False
+    if not transaction.amount:
+        return False
+    if not transaction.plus_account:
+        return False
+    if not transaction.minus_account:
+        return False
+    return True
+
+def validate_transactions(transactions: List[Transaction]) -> bool:
+    """
+    Validates a list of JSONTransaction objects
+    """
+    for transaction in transactions:
+        if not transaction.is_duplicate and not validate_transaction(transaction):
+            return False
+    return True
     
 
 ##################
 ### GENERATION ###
 ##################
-def generate_beancount_entry(transaction: JSONTransaction, owner: str) -> Dict[str,str]:
+def generate_beancount_entry(transaction: Transaction, owner: str) -> Dict[str,str]:
     """
     Generates (potentially) multiple beancount entries from the JSONTransaction object
     """
@@ -131,7 +169,7 @@ def generate_beancount_entry(transaction: JSONTransaction, owner: str) -> Dict[s
         result[person] = entry
     return result
 
-def generate_beancount_entries(transactions: List[JSONTransaction], owner: str) -> Dict[str, str]:
+def generate_beancount_entries(transactions: List[Transaction], owner: str) -> Dict[str, str]:
     """
     Generates beancount entries from a list of JSONTransaction objects
     """

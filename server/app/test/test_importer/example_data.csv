@@ -1,8 +1,6 @@
 "Account Type","Account Number","Transaction Date","Cheque Number","Description 1","Description 2","CAD$","USD$"
 Visa,123,1/6/2025,,"Sobeys",,-30.00,,
 Visa,123,1/7/2025,,"Bell",,-55.23,,
-Visa,123,1/9/2025,,"Shoppers",,-11.24,,
 Visa,123,1/10/2025,,"Spotify",,-9.82,,
 Savings,456,2/10/2025,,"Job",,100.00,,
-Savings,456,2/14/2025,,"Rent",,-1000.00,,
 Visa,123,1/24/2025,,"Electronics",,-24.00,,
