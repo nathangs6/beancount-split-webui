@@ -16,8 +16,8 @@ app.add_middleware(
 )
 
 
-from .importer import importer
-app.include_router(importer.router)
+from .importer import importer_routes
+app.include_router(importer_routes.router)
 from .accounts import accounts
 app.include_router(accounts.router)
 from .users import users

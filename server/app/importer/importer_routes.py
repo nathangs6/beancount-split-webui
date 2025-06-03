@@ -4,20 +4,9 @@ from io import StringIO
 
 from ..env import USER_1_NAME, USER_2_NAME, USER_1_BEANCOUNT_FILE, USER_2_BEANCOUNT_FILE
 
-from .beancount_types import FromBankTransaction, JSONTransaction
+from .types_beancount import FromBankTransaction, JSONTransaction
 
-from .bean_transactions import process_uploaded_file, generate_beancount_entries, update_beancount_file, validate_transactions, determine_duplicates
-
-
-
-
-column_mapping = {
-    "account_type": 0,
-    "account_number": 1,
-    "transaction_date": 2,
-    "description": 4,
-    "amount": 6,
-}
+from .importer_services import process_uploaded_file, generate_beancount_entries, update_beancount_file, validate_transactions, determine_duplicates
 
 
 router = APIRouter(prefix="/importer", tags=["importer"])

@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
 from ...main import app
-from ...config.categorization import apply_key_rule_categorization
-from ...importer.beancount_types import JSONTransaction
+from ...importer.helpers_categorization import apply_key_rule_categorization
+from ...importer.types_beancount import JSONTransaction
 
 client = TestClient(app)
 

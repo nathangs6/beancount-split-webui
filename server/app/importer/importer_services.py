@@ -3,8 +3,9 @@ from io import StringIO
 from typing import List, Dict
 from datetime import datetime
 from beancount import loader
-from .beancount_types import JSONTransaction, FromBankTransaction
+from .types_beancount import JSONTransaction, FromBankTransaction
 from ..env import INDENT_STRING, SHARED_NAME, USER_1_NAME, USER_1_BEANCOUNT_FILE, USER_2_NAME, USER_2_BEANCOUNT_FILE
+from ..config.config_services import get_csv_column_mapping
 
 #####################
 ### FILE HANDLING ###
@@ -13,17 +14,19 @@ def process_uploaded_file(contents: bytes) -> List[FromBankTransaction]:
     """
     Processes the uploaded file and returns a list of JSONTransaction objects
     """
+    # Get the column mapping
+    columns = get_csv_column_mapping()
     buffer = StringIO(contents.decode("utf-8"))
     reader = csv.reader(buffer)
     next(reader)
     transactions = []
     for row in reader:
         transaction = FromBankTransaction(
-            account_type=row[0],
-            account_number=row[1],
-            transaction_date=row[2],
-            description=row[4],
-            amount=float(row[6]),
+            account_type=row[columns["account_type"]],
+            account_number=row[columns["account_number"]],
+            transaction_date=row[columns["transaction_date"]],
+            description=row[columns["description"]],
+            amount=float(row[columns["amount"]]),
         )
         transaction.transaction_date = datetime.strptime(transaction.transaction_date, "%m/%d/%Y").strftime("%Y-%m-%d")
         transactions.append(transaction)
@@ -55,27 +58,30 @@ def validate_transactions(transactions: List[JSONTransaction]) -> bool:
     """
     for transaction in transactions:
         if not transaction.is_duplicate and not validate_transaction(transaction):
-            print(transaction)
             return False
     return True
 
-#########################
-### DUPLICATION CHECK ###
-#########################
-def determine_duplicates(transaction: JSONTransaction, beancount_lines: list[str]) -> None:
+######################
+### PRE-PROCESSING ###
+######################
+def preprocess_transactions(transactions: List[FromBankTransaction]) -> List[JSONTransaction]:
     """
-    Checks if a transaction is a duplicate of any transaction in the beancount file
+    Pre-processes the FromBankTransaction objects into JSONTransaction objects
     """
-    try:
-        # Read the file in reverse order
-        for line in reversed(beancount_lines):
-            if (transaction.transaction_date in line and
-                transaction.description in line and
-                transaction.extended_description in line):
-                transaction.is_duplicate = True
-                return 
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    json_transactions = []
+    for transaction in transactions:
+        json_transaction = JSONTransaction(
+            plus_account="",
+            minus_account="",
+            transaction_date=transaction.transaction_date,
+            description=transaction.description,
+            extended_description="",
+            amount=transaction.amount,
+            shared_percentages={},
+            is_duplicate=False
+        )
+        json_transactions.append(json_transaction)
+    return json_transactions
     
 
 ##################
