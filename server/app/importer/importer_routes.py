@@ -29,9 +29,9 @@ async def upload(owner: str, file: UploadFile = File(...)) -> list[Transaction]:
     transactions = process_uploaded_file(owner, contents)
     return transactions
 
-"""
 @router.post("/validate/{owner}")
-async def validate(owner: str, transactions: list[JSONTransaction]):
+async def validate(owner: str, transactions: list[Transaction]):
+    print("Validating transactions for owner:", owner)
     try:
         valid = validate_transactions(transactions)
         if not valid:
@@ -50,4 +50,3 @@ async def import_transactions(entries: dict[str, str]):
         return {"message": "Entries submitted successfully", "entries": entries}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error importing transactions: {str(e)}")
-"""

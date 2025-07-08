@@ -71,6 +71,7 @@ def process_uploaded_file(owner: str, contents: bytes) -> List[Transaction]:
 ######################
 ### PRE-PROCESSING ###
 ######################
+### TODO: Potential deletion?
 def preprocess_transactions(transactions: List[Transaction]) -> None:
     """
     Pre-processes the FromBankTransaction objects into JSONTransaction objects
@@ -96,7 +97,7 @@ def preprocess_transactions(transactions: List[Transaction]) -> None:
 ##################
 def validate_transaction(transaction: Transaction) -> bool:
     """
-    Validates the JSONTransaction object
+    Validates the Transaction object
     """
     if not transaction.transaction_date:
         return False
@@ -112,10 +113,11 @@ def validate_transaction(transaction: Transaction) -> bool:
 
 def validate_transactions(transactions: List[Transaction]) -> bool:
     """
-    Validates a list of JSONTransaction objects
+    Validates a list of Transaction objects
     """
     for transaction in transactions:
-        if not transaction.is_duplicate and not validate_transaction(transaction):
+        # Note: not checking if duplicate as it is handled in the pre-processing step
+        if not validate_transaction(transaction):
             return False
     return True
     
@@ -125,7 +127,7 @@ def validate_transactions(transactions: List[Transaction]) -> bool:
 ##################
 def generate_beancount_entry(transaction: Transaction, owner: str) -> Dict[str,str]:
     """
-    Generates (potentially) multiple beancount entries from the JSONTransaction object
+    Generates (potentially) multiple beancount entries from the Transaction object
     """
     result = {}
 
@@ -194,10 +196,7 @@ def update_beancount_file(new_entries: Dict[str, str]) -> None:
     Updates the beancount file with the new entries
     """
     for owner, entry in new_entries.items():
-        if owner == USER_1_NAME:
-            beancount_file_path = USER_1_BEANCOUNT_FILE
-        else:
-            beancount_file_path = USER_2_BEANCOUNT_FILE
+        beancount_file_path = USERS[owner]["beancount_file"]
         with open(beancount_file_path, "r") as f:
             bean_text = f.read()
         bean_text += "\n\n" + entry

@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 import os
 
 from ...main import app
+from ...env import SHARED_NAME, INDENT_STRING, USERS_LIST
 
 client = TestClient(app)
 
@@ -84,91 +85,100 @@ def test_upload():
     assert actual == expected
 
 
-# def test_validate_success():
-#     request = [
-#         {
-#             "plus_account": "Expenses:Food:Groceries",
-#             "minus_account": "Assets:Bank:Chequing",
-#             "transaction_date": "2025-01-06",
-#             "description": "Sobeys",
-#             "extended_description": "Oreos",
-#             "amount": -30.00,
-#             "shared_percentages": {
-#                 USER_1_NAME: 50,
-#                 USER_2_NAME: 50
-#             },
-#             "is_duplicate": False
-#         },
-#         {
-#             "plus_account": "Expenses:House",
-#             "minus_account": "Assets:Bank:Chequing",
-#             "transaction_date": "2025-01-07",
-#             "description": "Bell",
-#             "extended_description": "",
-#             "amount": -55.23,
-#             "shared_percentages": {
-#                 USER_1_NAME: 50,
-#                 USER_2_NAME: 50
-#             },
-#             "is_duplicate": False
-#         },
-#         {
-#             "plus_account": "Expenses:Food:Groceries",
-#             "minus_account": "Assets:Bank:Chequing",
-#             "transaction_date": "2025-01-06",
-#             "description": "Shoppers",
-#             "extended_description": "",
-#             "amount": -11.24,
-#             "shared_percentages": {
-#                 USER_1_NAME: 50,
-#                 USER_2_NAME: 50
-#             },
-#             "is_duplicate": True
-#         }
-#     ]
-#     response = client.post("/importer/validate/"+USER_1_NAME, json=request)
-#     assert response.status_code == 200
-#     actual = response.json()
-#     assert isinstance(actual, dict)
-#     assert "message" in actual
-#     assert actual["message"] == "Transactions are valid"
-#     assert "transaction_strings" in actual
-#     ts = actual["transaction_strings"]
-#     assert isinstance(ts, dict)
-#     print("Testing")
-#     expected = f"""; Imported by: {USER_1_NAME}, on: {datetime.today().strftime('%Y-%m-%d')}
+def test_validate_success():
+    USER_1_NAME = USERS_LIST[0]["name"]
+    USER_2_NAME = USERS_LIST[1]["name"]
+    request = [
+        {
+            "account_type": "Visa",
+            "account_number": "123",
+            "plus_account": "Expenses:Food:Groceries",
+            "minus_account": "Assets:Bank:Chequing",
+            "transaction_date": "2025-01-06",
+            "description": "Sobeys",
+            "extended_description": "Oreos",
+            "amount": -30.00,
+            "shared_percentages": {
+                USER_1_NAME: 50,
+                USER_2_NAME: 50
+            },
+            "is_duplicate": False
+        },
+        {
+            "account_type": "Visa",
+            "account_number": "123",
+            "plus_account": "Expenses:House",
+            "minus_account": "Assets:Bank:Chequing",
+            "transaction_date": "2025-01-07",
+            "description": "Bell",
+            "extended_description": "",
+            "amount": -55.23,
+            "shared_percentages": {
+                USER_1_NAME: 50,
+                USER_2_NAME: 50
+            },
+            "is_duplicate": False
+        },
+        {
+            "account_type": "Visa",
+            "account_number": "123",
+            "plus_account": "Expenses:Food:Groceries",
+            "minus_account": "Assets:Bank:Chequing",
+            "transaction_date": "2025-01-06",
+            "description": "Shoppers",
+            "extended_description": "",
+            "amount": -11.24,
+            "shared_percentages": {
+                USER_1_NAME: 50,
+                USER_2_NAME: 50
+            },
+            "is_duplicate": True
+        }
+    ]
+    response = client.post("/importer/validate/"+USER_1_NAME, json=request)
+    print(response.status_code)
+    assert response.status_code == 200
+    actual = response.json()
+    assert isinstance(actual, dict)
+    assert "message" in actual
+    assert actual["message"] == "Transactions are valid"
+    assert "transaction_strings" in actual
+    ts = actual["transaction_strings"]
+    assert isinstance(ts, dict)
+    print("Testing")
+    expected = f"""; Imported by: {USER_1_NAME}, on: {datetime.today().strftime('%Y-%m-%d')}
 
-# 2025-01-06 * "Sobeys" "Oreos"
-# {INDENT_STRING}Expenses:Food:Groceries 30.00 CAD
-# {INDENT_STRING}Assets:Bank:Chequing -30.00 CAD
+2025-01-06 * "Sobeys" "Oreos"
+{INDENT_STRING}Expenses:Food:Groceries 30.00 CAD
+{INDENT_STRING}Assets:Bank:Chequing -30.00 CAD
 
-# 2025-01-06 * "Reimbursement: Sobeys" "Oreos" #{SHARED_NAME}
-# {INDENT_STRING}Expenses:Food:Groceries:{SHARED_NAME} -15.00 CAD
-# {INDENT_STRING}Equity:{USER_2_NAME} 15.00 CAD
+2025-01-06 * "Reimbursement: Sobeys" "Oreos" #{SHARED_NAME}
+{INDENT_STRING}Expenses:Food:Groceries:{SHARED_NAME} -15.00 CAD
+{INDENT_STRING}Equity:{USER_2_NAME} 15.00 CAD
 
-# 2025-01-07 * "Bell" ""
-# {INDENT_STRING}Expenses:House 55.23 CAD
-# {INDENT_STRING}Assets:Bank:Chequing -55.23 CAD
+2025-01-07 * "Bell" ""
+{INDENT_STRING}Expenses:House 55.23 CAD
+{INDENT_STRING}Assets:Bank:Chequing -55.23 CAD
 
-# 2025-01-07 * "Reimbursement: Bell" "" #{SHARED_NAME}
-# {INDENT_STRING}Expenses:House:{SHARED_NAME} -27.61 CAD
-# {INDENT_STRING}Equity:{USER_2_NAME} 27.61 CAD"""
-#     expected_split = expected.split("\n")
-#     actual_split = ts[USER_1_NAME].split("\n")
-#     for i in range(len(expected_split)):
-#         if (expected_split[i] == actual_split[i]):
-#             continue
-#         print(f"Expected: {expected_split[i]}")
-#         print(f"Actual  : {actual_split[i]}")
-#     assert ts[USER_1_NAME] == expected
+2025-01-07 * "Reimbursement: Bell" "" #{SHARED_NAME}
+{INDENT_STRING}Expenses:House:{SHARED_NAME} -27.61 CAD
+{INDENT_STRING}Equity:{USER_2_NAME} 27.61 CAD"""
+    expected_split = expected.split("\n")
+    actual_split = ts[USER_1_NAME].split("\n")
+    for i in range(len(expected_split)):
+        if (expected_split[i] == actual_split[i]):
+            continue
+        print(f"Expected: {expected_split[i]}")
+        print(f"Actual  : {actual_split[i]}")
+    assert ts[USER_1_NAME] == expected
 
-#     expected = f"""; Imported by: {USER_1_NAME}, on: {datetime.today().strftime('%Y-%m-%d')}
+    expected = f"""; Imported by: {USER_1_NAME}, on: {datetime.today().strftime('%Y-%m-%d')}
 
-# 2025-01-06 * "Reimbursement: Sobeys" "Oreos" #{SHARED_NAME}
-# {INDENT_STRING}Expenses:Food:Groceries:{SHARED_NAME} 15.00 CAD
-# {INDENT_STRING}Equity:{USER_1_NAME} -15.00 CAD
+2025-01-06 * "Reimbursement: Sobeys" "Oreos" #{SHARED_NAME}
+{INDENT_STRING}Expenses:Food:Groceries:{SHARED_NAME} 15.00 CAD
+{INDENT_STRING}Equity:{USER_1_NAME} -15.00 CAD
 
-# 2025-01-07 * "Reimbursement: Bell" "" #{SHARED_NAME}
-# {INDENT_STRING}Expenses:House:{SHARED_NAME} 27.61 CAD
-# {INDENT_STRING}Equity:{USER_1_NAME} -27.61 CAD"""
-#     assert ts[USER_2_NAME] == expected
+2025-01-07 * "Reimbursement: Bell" "" #{SHARED_NAME}
+{INDENT_STRING}Expenses:House:{SHARED_NAME} 27.61 CAD
+{INDENT_STRING}Equity:{USER_1_NAME} -27.61 CAD"""
+    assert ts[USER_2_NAME] == expected
