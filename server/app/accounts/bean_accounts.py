@@ -1,16 +1,17 @@
 from fastapi import HTTPException
-from ..env import USER_1_BEANCOUNT_FILE, USER_2_BEANCOUNT_FILE, SHARED_NAME, USER_1_NAME, USER_2_NAME
+from ..env import USERS, USERS_LIST, SHARED_NAME
 
 def get_bean_accounts(owner: str):
     """
     Returns a list of accounts.
     """
     try:
+        if owner not in USERS:
+            raise ValueError(f"Invalid owner: {owner}.")
         accounts = []
         account_flag = False
-        beanfile = USER_1_BEANCOUNT_FILE if owner == USER_1_NAME else USER_2_BEANCOUNT_FILE
-        other_user = USER_2_NAME if owner == USER_1_NAME else USER_1_NAME
-        print(beanfile)
+        beanfile = USERS[owner]["beancount_file"]
+        other_user = USERS_LIST[0]["name"] if owner == USERS_LIST[1]["name"] else USERS_LIST[1]["name"]
         with open(beanfile, mode='r') as f:
             contents = f.read()
         for line in contents.splitlines():

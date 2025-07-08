@@ -21,11 +21,11 @@ export async function getAccounts(owner: string): Promise<string[]> {
   });
 }
 
-export async function processFile(file: File): Promise<CSVTransaction[]> {
+export async function processFile(file: File, owner: string): Promise<CSVTransaction[]> {
   const formData = new FormData();
   formData.append('file', file);
 
-  return await apiClient.post('/importer/upload', formData, {
+  return await apiClient.post('/importer/upload/'+owner, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

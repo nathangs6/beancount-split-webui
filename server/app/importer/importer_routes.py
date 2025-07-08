@@ -2,7 +2,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 import csv
 from io import StringIO
 
-from ..env import USER_1_NAME, USER_2_NAME
+from ..env import USERS
 
 from .types_beancount import Transaction
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/importer", tags=["importer"])
 @router.post("/upload/{owner}")
 async def upload(owner: str, file: UploadFile = File(...)) -> list[Transaction]:
     # First, determine if owner is a valid owner
-    if owner != USER_1_NAME and owner != USER_2_NAME:
+    if owner not in USERS:
         raise HTTPException(
             status_code=400, detail="Invalid owner. Must be USER_1 or USER_2."
         )

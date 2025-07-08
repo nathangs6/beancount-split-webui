@@ -1,0 +1,6 @@
+columns:
+  account_type: 0
+  account_number: 1
+  transaction_date: 2
+  description: 4
+  amount: 6

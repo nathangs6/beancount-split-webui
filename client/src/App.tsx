@@ -60,7 +60,7 @@ export default function App() {
       return false;
     }
 
-    const response = await processFile(file);
+    const response = await processFile(file, owner);
 
     const accounts = await getAccounts(owner);
     setAccounts(accounts);

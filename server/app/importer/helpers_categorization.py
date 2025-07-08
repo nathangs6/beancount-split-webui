@@ -1,6 +1,6 @@
 from app.importer.types_beancount import Transaction
 from app.config.config_services import get_key_rules
-from ..env import USER_1_NAME, USER_2_NAME
+from ..env import USERS_LIST
 
 def determine_duplicates(transactions: list[Transaction], beancount: list[str]) -> None:
     """
@@ -15,7 +15,7 @@ def determine_duplicates(transactions: list[Transaction], beancount: list[str]) 
                 transaction.is_duplicate = True
                 continue
 
-def apply_key_rule_categorization(transactions: list[Transaction]):
+def apply_key_rule_categorization(transactions: list[Transaction], owner: str):
     """
     Apply key rule categorization to a list of transactions.
     
@@ -25,7 +25,7 @@ def apply_key_rule_categorization(transactions: list[Transaction]):
     """
 
     try:
-        rules = get_key_rules()["keyrules"]
+        rules = get_key_rules(owner)["keyrules"]
     except Exception as e:
         raise Exception(f"Error reading key rules configuration: {str(e)}")
     for transaction in transactions:
@@ -39,6 +39,6 @@ def apply_key_rule_categorization(transactions: list[Transaction]):
                         transaction.minus_account = rule["minus_account"]
                     if transaction.shared_percentages == {} and rule["shared_percentages"] is not None:
                         transaction.shared_percentages = {
-                            USER_1_NAME: rule["shared_percentages"][0],
-                            USER_2_NAME: rule["shared_percentages"][1],
+                            USERS_LIST[0]["name"]: rule["shared_percentages"][0],
+                            USERS_LIST[1]["name"]: rule["shared_percentages"][1],
                         }

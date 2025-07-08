@@ -1,0 +1,19 @@
+keyrules:
+  rule0:
+    type: "description"
+    name: "Sobeys"
+    key: "sobeys"
+    plus_account: "Expenses:Food:Groceries"
+    minus_account: ""
+    shared_percentages:
+      - 50
+      - 50
+    is_duplicate: false
+  rule1:
+    type: "description"
+    name: "Internet"
+    key: "bell"
+    plus_account: "Expenses:House"
+    minus_account: ""
+    shared_percentages:
+    is_duplicate: false

@@ -4,14 +4,14 @@ from typing import List, Dict
 from datetime import datetime
 from beancount import loader
 from .types_beancount import Transaction
-from ..env import INDENT_STRING, SHARED_NAME, USER_1_NAME, USER_1_BEANCOUNT_FILE, USER_2_NAME, USER_2_BEANCOUNT_FILE
+from ..env import INDENT_STRING, SHARED_NAME, USERS
 from ..config.config_services import get_csv_column_mapping
 from .helpers_categorization import determine_duplicates, apply_key_rule_categorization
 
 #####################
 ### FILE HANDLING ###
 #####################
-def init_transactions(contents: bytes) -> List[Transaction]:
+def init_transactions(contents: bytes, owner: str) -> List[Transaction]:
     """
     Given an uploaded file containing bytes content contents, process the file
     and return a list of initialized transactions.
@@ -20,7 +20,7 @@ def init_transactions(contents: bytes) -> List[Transaction]:
     Output: A list of initialized Transaction
     """
     # Get the column mapping
-    columns = get_csv_column_mapping()
+    columns = get_csv_column_mapping(owner)
     # Then, read the file and create the transaction list
     buffer = StringIO(contents.decode("utf-8"))
     reader = csv.reader(buffer)
@@ -44,12 +44,10 @@ def init_transactions(contents: bytes) -> List[Transaction]:
     return transactions
 
 def load_beancount_file(owner: str):
-    if owner == USER_1_NAME:
-        fp = USER_1_BEANCOUNT_FILE
-    elif owner == USER_2_NAME:
-        fp = USER_2_BEANCOUNT_FILE
-    else:
+    if owner not in USERS:
         raise Exception("Owner not valid!")
+    user = USERS[owner]
+    fp = user["beancount_file"]
     try:
         with open(fp, "r") as file:
             beancount_data = file.readlines()
@@ -61,12 +59,12 @@ def process_uploaded_file(owner: str, contents: bytes) -> List[Transaction]:
     """
     Processes the uploaded file and returns a list of JSONTransaction objects
     """
-    transactions = init_transactions(contents)
+    transactions = init_transactions(contents, owner)
     # Next, load the beancount file
     beancount = load_beancount_file(owner)
     # Now, apply the varying pre-processing methods for the transactions
     determine_duplicates(transactions, beancount)
-    apply_key_rule_categorization(transactions)
+    apply_key_rule_categorization(transactions, owner)
     return transactions
 
 
@@ -79,7 +77,7 @@ def preprocess_transactions(transactions: List[Transaction]) -> None:
     """
     json_transactions = []
     for transaction in transactions:
-        json_transaction = JSONTransaction(
+        json_transaction = Transaction(
             plus_account="",
             minus_account="",
             transaction_date=transaction.transaction_date,
