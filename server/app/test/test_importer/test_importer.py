@@ -3,7 +3,6 @@ from fastapi.testclient import TestClient
 import os
 
 from ...main import app
-from ...env import USER_1_NAME, USER_2_NAME, INDENT_STRING, SHARED_NAME
 
 client = TestClient(app)
 

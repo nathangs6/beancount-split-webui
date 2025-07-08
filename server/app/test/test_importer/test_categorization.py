@@ -45,7 +45,7 @@ def test_rule_based():
     for transaction in request:
         transactions.append(Transaction(**transaction))
     
-    apply_key_rule_categorization(transactions)
+    apply_key_rule_categorization(transactions, "Bob")
     assert transactions[0].plus_account == "Expenses:Food:Groceries"
     assert transactions[0].minus_account == "Assets:Bank:Chequing"
     assert transactions[0].shared_percentages == {
