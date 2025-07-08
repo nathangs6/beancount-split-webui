@@ -34,9 +34,11 @@ async def validate(owner: str, transactions: list[Transaction]):
     print("Validating transactions for owner:", owner)
     try:
         valid = validate_transactions(transactions)
+        print("Validated!")
         if not valid:
             raise HTTPException(status_code=400, detail="Invalid transactions")
         entries = generate_beancount_entries(transactions, owner)
+        print("Entries generated!")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error validating transactions: {str(e)}")

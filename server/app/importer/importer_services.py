@@ -116,8 +116,8 @@ def validate_transactions(transactions: List[Transaction]) -> bool:
     Validates a list of Transaction objects
     """
     for transaction in transactions:
-        # Note: not checking if duplicate as it is handled in the pre-processing step
-        if not validate_transaction(transaction):
+        if not transaction.is_duplicate and not validate_transaction(transaction):
+            print(transaction)
             return False
     return True
     
@@ -173,6 +173,7 @@ def generate_beancount_entries(transactions: List[Transaction], owner: str) -> D
     """
     Generates beancount entries from a list of JSONTransaction objects
     """
+    print("Generating entries!")
     result = {}
     for transaction in transactions:
         if transaction.is_duplicate:

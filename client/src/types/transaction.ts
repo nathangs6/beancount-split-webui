@@ -1,4 +1,6 @@
 export type Transaction = {
+    account_type: string;
+    account_number: string;
     plus_account: string;
     minus_account: string;
     transaction_date: string;
@@ -7,12 +9,4 @@ export type Transaction = {
     amount: number;
     shared_percentages: { [index: string]: number };
     is_duplicate: boolean;
-}
-
-export type CSVTransaction = {
-    account_type: string;
-    account_number: string;
-    amount: number;
-    description: string;
-    transaction_date: string;
 }

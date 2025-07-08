@@ -13,7 +13,7 @@ def determine_duplicates(transactions: list[Transaction], beancount: list[str]) 
                 transaction.description in line and
                 transaction.extended_description in line):
                 transaction.is_duplicate = True
-                continue
+                break
 
 def apply_key_rule_categorization(transactions: list[Transaction], owner: str):
     """

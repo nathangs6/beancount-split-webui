@@ -6,10 +6,9 @@ import {
   getAccounts,
   processFile,
   validateTransactions,
-  determineDuplicates,
   submitImport,
 } from "./api";
-import type { CSVTransaction, Transaction } from "./types/transaction";
+import type { Transaction } from "./types/transaction";
 import FileUpload from "./components/FileUpload";
 import TransactionList from "./components/TransactionList";
 import FileAccountSelector from "./components/FileAccountSelector";
@@ -19,7 +18,7 @@ export default function App() {
   const [users, setUsers] = useState<string[]>([]);
   const [owner, setOwner] = useState<string>("");
   const [accounts, setAccounts] = useState<string[]>([]);
-  const [csvTransactions, setCSVTransactions] = useState<CSVTransaction[]>([]);
+  const [csvTransactions, setCSVTransactions] = useState<Transaction[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionStrings, setTransactionStrings] = useState<{
     [user: string]: string;
@@ -88,6 +87,8 @@ export default function App() {
         plusAccount = "";
       }
       const transaction: Transaction = {
+        account_type: csvTransaction.account_type,
+        account_number: csvTransaction.account_number,
         plus_account: plusAccount,
         minus_account: minusAccount,
         transaction_date: csvTransaction.transaction_date,
@@ -95,15 +96,15 @@ export default function App() {
         extended_description: "",
         amount: csvTransaction.amount,
         shared_percentages: {},
-        is_duplicate: false,
+        is_duplicate: csvTransaction.is_duplicate,
       };
       tempTransactions.push(transaction);
     }
-    const duplicatesDeterminedTransactions = await determineDuplicates(
-      tempTransactions,
-      owner
-    );
-    setTransactions(duplicatesDeterminedTransactions);
+    // const duplicatesDeterminedTransactions = await determineDuplicates(
+      // tempTransactions,
+      // owner
+    // );
+    setTransactions(tempTransactions);
     setShowTransactionList(true);
     setSubmitSuccess(null);
     setSubmitError(null);

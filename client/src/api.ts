@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import type { CSVTransaction, Transaction } from './types/transaction';
+import type { Transaction } from './types/transaction';
 
 export async function getUsers(): Promise<string[]> {
   return await apiClient.get('/users')
@@ -21,7 +21,7 @@ export async function getAccounts(owner: string): Promise<string[]> {
   });
 }
 
-export async function processFile(file: File, owner: string): Promise<CSVTransaction[]> {
+export async function processFile(file: File, owner: string): Promise<Transaction[]> {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -38,15 +38,15 @@ export async function processFile(file: File, owner: string): Promise<CSVTransac
   });
 }
 
-export async function determineDuplicates(transactions: Transaction[], owner: string) : Promise<Transaction[]> {
-  return await apiClient.post('/importer/determine_duplicates/' + owner, transactions)
-  .then((response) => {
-    return response.data.transactions;
-  })
-  .catch((error) => {
-    throw error;
-  });
-}
+// export async function determineDuplicates(transactions: Transaction[], owner: string) : Promise<Transaction[]> {
+  // return await apiClient.post('/importer/determine_duplicates/' + owner, transactions)
+  // .then((response) => {
+    // return response.data.transactions;
+  // })
+  // .catch((error) => {
+    // throw error;
+  // });
+// }
 
 export async function validateTransactions(transactions: Transaction[], owner: string): Promise<{[user: string]: string}> {
   return await apiClient.post('/importer/validate/' + owner, transactions)
