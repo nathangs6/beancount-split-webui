@@ -4,7 +4,7 @@ services:
       context: ./server
       target: dev
     ports:
-      - "8000:8000"
+      - "${SERVER_PORT}:8000"
     volumes:
       - ./server:/app
       - ${GLOBAL_FAVA_DIR}:/app/fava
@@ -20,7 +20,7 @@ services:
       context: ./client
       target: dev
     ports:
-      - "3000:5173"
+      - "${CLIENT_PORT}:5173"
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -32,7 +32,7 @@ services:
   fava_user1:
     image: yegle/fava
     ports:
-      - "5000:5000"
+      - "${FAVA1_PORT}:5000"
     volumes:
       - ${GLOBAL_FAVA_DIR}/${USER_1_NAME}:/bean
     environment:
@@ -43,7 +43,7 @@ services:
   fava_user2:
     image: yegle/fava
     ports:
-      - "5001:5000"
+      - "${FAVA2_PORT}:5000"
     volumes:
       - ${GLOBAL_FAVA_DIR}/${USER_2_NAME}:/bean
     environment:
