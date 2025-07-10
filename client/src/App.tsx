@@ -81,10 +81,10 @@ export default function App() {
     for (const csvTransaction of csvTransactions) {
       if (csvTransaction.amount > 0) {
         plusAccount = accountSelections[csvTransaction.account_number];
-        minusAccount = "";
+        minusAccount = csvTransaction.minus_account;
       } else {
         minusAccount = accountSelections[csvTransaction.account_number];
-        plusAccount = "";
+        plusAccount = csvTransaction.plus_account;
       }
       const transaction: Transaction = {
         account_type: csvTransaction.account_type,
@@ -95,7 +95,7 @@ export default function App() {
         description: csvTransaction.description,
         extended_description: "",
         amount: csvTransaction.amount,
-        shared_percentages: {},
+        shared_percentages: csvTransaction.shared_percentages,
         is_duplicate: csvTransaction.is_duplicate,
       };
       tempTransactions.push(transaction);

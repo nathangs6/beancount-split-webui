@@ -67,7 +67,7 @@ export default function TransactionList({
         <tbody>
           {transactions.map((transaction, index) => (
             <tr key={index}>
-              <td>{transaction.description}</td>
+              <td style={(transaction.minus_account == "" || transaction.plus_account == "") ? {color: "red"} : {}}>{transaction.description}</td>
               <td>{transaction.transaction_date}</td>
               <td>{Math.abs(transaction.amount).toFixed(2)}</td>
               <td>
@@ -171,7 +171,7 @@ export default function TransactionList({
       </table>
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       <button onClick={() => {handleValidate(transactions)}
-      }>Valiate Transactions</button>
+      }>Validate Transactions</button>
     </div>
   );
 }

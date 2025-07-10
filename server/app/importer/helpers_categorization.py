@@ -26,6 +26,7 @@ def apply_key_rule_categorization(transactions: list[Transaction], owner: str):
 
     try:
         rules = get_key_rules(owner)["keyrules"]
+        print(rules)
     except Exception as e:
         raise Exception(f"Error reading key rules configuration: {str(e)}")
     for transaction in transactions:
@@ -33,11 +34,9 @@ def apply_key_rule_categorization(transactions: list[Transaction], owner: str):
             rule = rules[rule_key]
             if rule["type"] == "description":
                 if rule["key"] in transaction.description.lower():
-                    if transaction.plus_account == "":
-                        transaction.plus_account = rule["plus_account"]
-                    if transaction.minus_account == "":
-                        transaction.minus_account = rule["minus_account"]
-                    if transaction.shared_percentages == {} and rule["shared_percentages"] is not None:
+                    transaction.plus_account = rule["plus_account"]
+                    transaction.minus_account = rule["minus_account"]
+                    if rule["shared_percentages"] is not None:
                         transaction.shared_percentages = {
                             USERS_LIST[0]["name"]: rule["shared_percentages"][0],
                             USERS_LIST[1]["name"]: rule["shared_percentages"][1],
