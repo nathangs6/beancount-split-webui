@@ -13,7 +13,7 @@ export default function FileUpload({
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.type !== "text/csv") {
+      if (selectedFile.type !== "text/csv" && selectedFile.type !== "application/vnd.ms-excel") {
         setRenderKey(new Date());
         setMessage(`Invalid file type (${selectedFile.type}). Please select a CSV file.`);
         setFile(null);
